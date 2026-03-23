@@ -44,6 +44,8 @@ namespace TheSpellBrigadeHelper
 
             Log = base.Log;
             Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
+            Log.LogInfo("本插件免费开源，交流群: 1082742732，开源地址: https://github.com/moemoli/TheSpellBrigadeHelper");
+            Log.LogInfo("The plugin is open source，address: https://github.com/moemoli/TheSpellBrigadeHelper");
         }
 
         private void LoadConfig()
