@@ -22,20 +22,20 @@ namespace TheSpellBrigadeHelper.Modules
             }
             if (Plugin.Instance.KillAura.Value)
             {
-                __0.Damage = float.MaxValue;
+                __0.Damage = __instance.healthContainer.CurrentHealth;
             }
         }
 
 
         // 补丁：全图秒杀
         [HarmonyPatch(typeof(Enemy), "Update")]
-        [HarmonyPrefix]
+        [HarmonyPostfix]
         static void Update_Enemy(Enemy __instance)
         {
             if (Plugin.Instance.KillAll.Value)
             {
                 DamageInfo damage = new DamageInfo();
-                damage.Damage = float.MaxValue;
+                damage.Damage = __instance.hitbox.healthContainer.CurrentHealth;
                 __instance.hitbox.Hit(damage);
             }
         }

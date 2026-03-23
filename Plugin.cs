@@ -1,4 +1,4 @@
-ï»¿using BepInEx;
+using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
@@ -17,12 +17,17 @@ namespace TheSpellBrigadeHelper
     public class Plugin : BasePlugin
     {
         internal static new ManualLogSource Log;
-        public ConfigEntry<bool> GodMode;
-        public ConfigEntry<bool> KillAura;
-        public ConfigEntry<bool> NoSpellCoolDown;
-        public ConfigEntry<bool> StatsModifier;
-        public ConfigEntry<bool> PickUpAll;
-        public ConfigEntry<bool> KillAll;
+        public ConfigEntry<bool> GodMode { get; private set; }
+        public ConfigEntry<bool> KillAura { get; private set; }
+        public ConfigEntry<bool> NoSpellCoolDown { get; private set; }
+        public ConfigEntry<bool> StatsModifier { get; private set; }
+        public ConfigEntry<bool> PickUpAll { get; private set; }
+        public ConfigEntry<bool> KillAll { get; private set; }
+        public ConfigEntry<bool> AutoTask { get; private set; }
+        public ConfigEntry<bool> AutoArtifact { get; private set; }
+        public ConfigEntry<float> AddSpell { get; private set; }
+        public ConfigEntry<float> BigSpell { get; private set; }
+
         public Hashtable stats;
         public Hashtable statsDesc;
 
@@ -34,72 +39,77 @@ namespace TheSpellBrigadeHelper
             Instance = this;
             stats = new Hashtable();
             statsDesc = new Hashtable();
-            // åŠ è½½é…ç½®æ–‡ä»¶
+            // ¼ÓÔØÅäÖÃÎÄ¼ş
             LoadConfig();
             // Plugin startup logic
             Harmony.CreateAndPatchAll(typeof(GodMode));
             Harmony.CreateAndPatchAll(typeof(KillAura));
             Harmony.CreateAndPatchAll(typeof(SpellsModifier));
             Harmony.CreateAndPatchAll(typeof(StatCustomModifier));
+            Harmony.CreateAndPatchAll(typeof(AutoArtifact));
 
             Log = base.Log;
             Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
-            Log.LogInfo("æœ¬æ’ä»¶å…è´¹å¼€æºï¼Œäº¤æµç¾¤: 1082742732ï¼Œå¼€æºåœ°å€: https://github.com/moemoli/TheSpellBrigadeHelper");
-            Log.LogInfo("The plugin is open sourceï¼Œaddress: https://github.com/moemoli/TheSpellBrigadeHelper");
+            Log.LogInfo("±¾²å¼şÃâ·Ñ¿ªÔ´£¬½»Á÷Èº: 1082742732£¬¿ªÔ´µØÖ·: https://github.com/moemoli/TheSpellBrigadeHelper");
+            Log.LogInfo("The plugin is open source£¬address: https://github.com/moemoli/TheSpellBrigadeHelper");
         }
 
         private void LoadConfig()
         {
-            this.GodMode = Config.Bind("General", "GodMode", false, "ä¸Šå¸æ¨¡å¼");
-            this.KillAura = Config.Bind("General", "KillAura", false, "ä¸€å‡»å¿…æ€");
-            this.NoSpellCoolDown = Config.Bind("General", "NoSpellCoolDown", false, "æŠ€èƒ½æ— å†·å´");
-            this.StatsModifier = Config.Bind("General", "StatsModifier", false, "å±æ€§ä¿®æ”¹");
-            this.PickUpAll = Config.Bind("General", "PickUpAll", false, "å…¨å›¾å¸å–");
-            this.KillAll = Config.Bind("General", "KillAll", false, "å…¨å›¾å‡»æ€");
+            this.GodMode = Config.Bind("General", "GodMode", false, "ÉÏµÛÄ£Ê½");
+            this.KillAura = Config.Bind("General", "KillAura", false, "Ò»»÷±ØÉ±");
+            this.NoSpellCoolDown = Config.Bind("General", "NoSpellCoolDown", false, "¼¼ÄÜÎŞÀäÈ´");
+            this.StatsModifier = Config.Bind("General", "StatsModifier", false, "ÊôĞÔĞŞ¸Ä");
+            this.PickUpAll = Config.Bind("General", "PickUpAll", false, "È«Í¼ÎüÈ¡");
+            this.KillAll = Config.Bind("General", "KillAll", false, "È«Í¼»÷É±");
+            //this.AutoTask = Config.Bind("General", "AutoTask", false, "Ò»¼üÍê³ÉÈÎÎñ");
+            //this.AutoArtifact = Config.Bind("General", "AutoArtifact", false, "Ò»¼ü»ñµÃÒÅÆ÷");
+            //this.AddSpell = Config.Bind("General", "AddSpell", -1f, "Ìí¼ÓÒ»´Î¶îÍâ·¨ÊõÉä»÷");
+            //this.BigSpell = Config.Bind("General", "BigSpell", -1f, "Ìí¼Ó·¨Êõ·¶Î§");
             
-            statsDesc.Add(StatType.Damage, "ä¼¤å®³");
-            statsDesc.Add(StatType.Range, "æŠ€èƒ½èŒƒå›´");
-            statsDesc.Add(StatType.FireRate, "æŠ€èƒ½å°„é€Ÿ");
-            statsDesc.Add(StatType.Speed, "æŠ€èƒ½é€Ÿåº¦");
-            statsDesc.Add(StatType.DamageTickRate, "ä¼¤å®³é¢‘ç‡");
-            statsDesc.Add(StatType.Size, "æŠ€èƒ½å¤§å°");
-            statsDesc.Add(StatType.MovementSpeed, "ç§»åŠ¨é€Ÿåº¦");
-            statsDesc.Add(StatType.MaxHealth, "æœ€å¤§è¡€é‡");
-            statsDesc.Add(StatType.Luck, "å¹¸è¿å€¼");
-            statsDesc.Add(StatType.XPGain, "ç»éªŒå€ç‡");
-            statsDesc.Add(StatType.PickupRadius, "æ‹¾å–èŒƒå›´");
-            statsDesc.Add(StatType.CriticalChance, "æš´å‡»ç‡");
-            statsDesc.Add(StatType.CriticalDamage, "æš´å‡»ä¼¤å®³");
-            statsDesc.Add(StatType.Armor, "æŠ¤ç”²");
-            statsDesc.Add(StatType.Dodge, "é—ªé¿");
-            statsDesc.Add(StatType.HealthRegeneration, "ç”Ÿå‘½æ¢å¤");
-            statsDesc.Add(StatType.Rerolls, "é‡æ·");
-            statsDesc.Add(StatType.ReviveSpeed, "é‡ç”Ÿé€Ÿåº¦");
-            statsDesc.Add(StatType.Revives, "é‡ç”Ÿæ¬¡æ•°");
+            statsDesc.Add(StatType.Damage, "ÉËº¦");
+            statsDesc.Add(StatType.Range, "¼¼ÄÜ·¶Î§");
+            statsDesc.Add(StatType.FireRate, "¼¼ÄÜÉäËÙ");
+            statsDesc.Add(StatType.Speed, "¼¼ÄÜËÙ¶È");
+            statsDesc.Add(StatType.DamageTickRate, "ÉËº¦ÆµÂÊ");
+            statsDesc.Add(StatType.Size, "¼¼ÄÜ´óĞ¡");
+            statsDesc.Add(StatType.MovementSpeed, "ÒÆ¶¯ËÙ¶È");
+            statsDesc.Add(StatType.MaxHealth, "×î´óÑªÁ¿");
+            statsDesc.Add(StatType.Luck, "ĞÒÔËÖµ");
+            statsDesc.Add(StatType.XPGain, "¾­Ñé±¶ÂÊ");
+            statsDesc.Add(StatType.PickupRadius, "Ê°È¡·¶Î§");
+            statsDesc.Add(StatType.CriticalChance, "±©»÷ÂÊ");
+            statsDesc.Add(StatType.CriticalDamage, "±©»÷ÉËº¦");
+            statsDesc.Add(StatType.Armor, "»¤¼×");
+            statsDesc.Add(StatType.Dodge, "ÉÁ±Ü");
+            statsDesc.Add(StatType.HealthRegeneration, "ÉúÃü»Ö¸´");
+            statsDesc.Add(StatType.Rerolls, "ÖØÖÀ");
+            statsDesc.Add(StatType.ReviveSpeed, "ÖØÉúËÙ¶È");
+            statsDesc.Add(StatType.Revives, "ÖØÉú´ÎÊı");
             statsDesc.Add(StatType.Projectiles, "Projectiles");
-            statsDesc.Add(StatType.HealOnDodge, "é—ªé¿æ²»ç–—");
-            statsDesc.Add(StatType.HealOnLevelUp, "é—ªé¿å‡çº§");
-            statsDesc.Add(StatType.DropChance, "æ‰è½å‡ ç‡");
-            statsDesc.Add(StatType.TerrainSpeedMultiplier, "åœ°å½¢é€Ÿåº¦å€ç‡");
-            statsDesc.Add(StatType.HitboxSizeMultiplier, "ç¢°æ’ç®±å¤§å°å€ç‡");
-            statsDesc.Add(StatType.ElementWeaknessMultiplier, "å…ƒç´ å¼±ç‚¹å€ç‡");
-            statsDesc.Add(StatType.ElementStrengthMultiplier, "å…ƒç´ å¼ºåº¦å€ç‡");
-            statsDesc.Add(StatType.HealingMultiplier, "æ²»ç–—å€ç‡");
-            statsDesc.Add(StatType.XPGainOnDamageTaken, "å—åˆ°ä¼¤å®³æ—¶è·å¾—çš„ç»éªŒ");
-            statsDesc.Add(StatType.HealthPotionAmountMultiplier, "ç”Ÿå‘½è¯æ°´æ¢å¤å€ç‡");
+            statsDesc.Add(StatType.HealOnDodge, "ÉÁ±ÜÖÎÁÆ");
+            statsDesc.Add(StatType.HealOnLevelUp, "ÉÁ±ÜÉı¼¶");
+            statsDesc.Add(StatType.DropChance, "µôÂä¼¸ÂÊ");
+            statsDesc.Add(StatType.TerrainSpeedMultiplier, "µØĞÎËÙ¶È±¶ÂÊ");
+            statsDesc.Add(StatType.HitboxSizeMultiplier, "Åö×²Ïä´óĞ¡±¶ÂÊ");
+            statsDesc.Add(StatType.ElementWeaknessMultiplier, "ÔªËØÈõµã±¶ÂÊ");
+            statsDesc.Add(StatType.ElementStrengthMultiplier, "ÔªËØÇ¿¶È±¶ÂÊ");
+            statsDesc.Add(StatType.HealingMultiplier, "ÖÎÁÆ±¶ÂÊ");
+            statsDesc.Add(StatType.XPGainOnDamageTaken, "ÊÜµ½ÉËº¦Ê±»ñµÃµÄ¾­Ñé");
+            statsDesc.Add(StatType.HealthPotionAmountMultiplier, "ÉúÃüÒ©Ë®»Ö¸´±¶ÂÊ");
 
             foreach (StatType stat in Enum.GetValues(typeof(StatType)))
             {
-                stats.Add(stat, Config.Bind("StatModifier", stat.ToString(), -1f, $"ä¿®æ”¹{statsDesc[stat]}å±æ€§çš„æ•°å€¼"));
+                stats.Add(stat, Config.Bind("StatModifier", stat.ToString(), -1f, $"ĞŞ¸Ä{statsDesc[stat]}ÊôĞÔµÄÊıÖµ"));
             }
 
         }
 
         public override bool Unload()
         {
-            // ç¡®ä¿æœ€ç»ˆä¿å­˜
+            // È·±£×îÖÕ±£´æ
             Config.Save();
-            Log.LogInfo("æ¸¸æˆé€€å‡ºï¼Œé…ç½®å·²ä¿å­˜");
+            Log.LogInfo("ÓÎÏ·ÍË³ö£¬ÅäÖÃÒÑ±£´æ");
             return false;
         }
 

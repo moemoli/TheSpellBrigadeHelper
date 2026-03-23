@@ -17,7 +17,8 @@ namespace TheSpellBrigadeHelper.Modules
         [HarmonyPostfix]
         static void Update_PlayerHealthContainer(PlayerHealthContainer __instance)
         {
-            __instance.GodModeIsEnabled = Plugin.Instance.GodMode.Value;
+            if (Plugin.Instance.GodMode.Value)
+                __instance.GodModeIsEnabled = Plugin.Instance.GodMode.Value;
         }
         // 补丁：敌人接触伤害设置为0
         [HarmonyPatch(typeof(Enemy), "Update")]
