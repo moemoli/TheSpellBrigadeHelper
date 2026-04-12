@@ -62,10 +62,10 @@ namespace TheSpellBrigadeHelper
             this.StatsModifier = Config.Bind("General", "StatsModifier", false, "属性修改");
             this.PickUpAll = Config.Bind("General", "PickUpAll", false, "全图吸取");
             this.KillAll = Config.Bind("General", "KillAll", false, "全图击杀");
-            //this.AutoTask = Config.Bind("General", "AutoTask", false, "一键完成任务");
-            //this.AutoArtifact = Config.Bind("General", "AutoArtifact", false, "一键获得遗器");
-            //this.AddSpell = Config.Bind("General", "AddSpell", -1f, "添加一次额外法术射击");
-            //this.BigSpell = Config.Bind("General", "BigSpell", -1f, "添加法术范围");
+            this.AutoTask = Config.Bind("General", "AutoTask", false, "一键完成任务");
+            this.AutoArtifact = Config.Bind("General", "AutoArtifact", false, "一键获得遗器");
+            this.AddSpell = Config.Bind("General", "AddSpell", -1f, "添加一次额外法术射击");
+            this.BigSpell = Config.Bind("General", "BigSpell", -1f, "添加法术范围");
             
             statsDesc.Add(StatType.Damage, "伤害");
             statsDesc.Add(StatType.Range, "技能范围");
