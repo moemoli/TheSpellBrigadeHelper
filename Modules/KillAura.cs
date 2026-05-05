@@ -20,6 +20,15 @@ namespace TheSpellBrigadeHelper.Modules
             {
                 return;
             }
+            if (Plugin.Instance.GodMode.Value)
+            {
+                if (__instance.healthContainer is PlayerHealthContainer)
+                {
+                    __0.Damage = 0;
+                    return;
+                }
+
+            }
             if (Plugin.Instance.KillAura.Value)
             {
                 __0.Damage = __instance.healthContainer.CurrentHealth;

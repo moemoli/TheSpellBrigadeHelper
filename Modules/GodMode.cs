@@ -12,14 +12,6 @@ namespace TheSpellBrigadeHelper.Modules
     internal class GodMode
     {
 
-        // 补丁：强制开始上帝模式
-        [HarmonyPatch(typeof(PlayerHealthContainer), "Update")]
-        [HarmonyPostfix]
-        static void Update_PlayerHealthContainer(PlayerHealthContainer __instance)
-        {
-            if (Plugin.Instance.GodMode.Value)
-                __instance.GodModeIsEnabled = Plugin.Instance.GodMode.Value;
-        }
         // 补丁：敌人接触伤害设置为0
         [HarmonyPatch(typeof(Enemy), "Update")]
         [HarmonyPostfix]
